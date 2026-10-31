@@ -1,11 +1,16 @@
 from models.binary_tree import BinaryTree
 
 tree = BinaryTree()
+
 tree.insert("Documents", True)
 tree.insert("Backups", True)
 tree.insert("Pictures", True)
+tree.insert("Archive", True)
+tree.insert("Photos", True)
 
-print("In-order:", tree.in_order())
-print("Pre-order:", tree.pre_order())
-print("Post-order:", tree.post_order())
-print("Level-order:", tree.level_order())
+print("Before:", tree.in_order())
+
+result = tree.delete("Documents")
+
+print("Deleted:", result)
+print("After:", tree.in_order())

@@ -51,6 +51,81 @@ class BinaryTree:
 
         return None, comparisons
 
+    def _find_node(self, name):
+
+        current = self.root
+        parent = None
+
+        while current is not None:
+
+            if name.casefold() == current.name.casefold():
+                return current, parent
+
+            parent = current
+
+            if name.casefold() < current.name.casefold():
+                current = current.left
+            else:
+                current = current.right
+
+        return None, None
+
+    def delete(self, name):
+
+        node, parent = self._find_node(name)
+
+        if node is None:
+            return False
+
+        if node.left is None and node.right is None:
+
+            if parent is None:
+                self.root = None
+
+            elif parent.left == node:
+                parent.left = None
+
+            else:
+                parent.right = None
+
+            return True
+
+        if node.left is None or node.right is None:
+
+            child = node.left if node.left is not None else node.right
+
+            if parent is None:
+                self.root = child
+
+            elif parent.left == node:
+                parent.left = child
+
+            else:
+                parent.right = child
+
+            return True
+
+        if node.left is not None and node.right is not None:
+
+            successor_parent = node
+            successor = node.right
+
+            while successor.left is not None:
+                successor_parent = successor
+                successor = successor.left
+
+            node.name = successor.name
+            node.is_folder = successor.is_folder
+
+            if successor_parent.left == successor:
+                successor_parent.left = successor.right
+            else:
+                successor_parent.right = successor.right
+
+            return True
+
+        return False
+
     def in_order(self):
 
         result = []
@@ -116,3 +191,17 @@ class BinaryTree:
                 queue.append(current.right)
 
         return result
+
+    def height(self):
+
+        def calculate_height(current):
+            
+            if current is None:
+                return 0
+
+            left_height = calculate_height(current.left)
+            right_height = calculate_height(current.right)
+
+            return 1 + max(left_height, right_height)
+
+        return calculate_height(self.root)
