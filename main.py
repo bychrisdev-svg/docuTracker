@@ -1,16 +1,5 @@
-from models.binary_tree import BinaryTree
+from controllers.tree_controller import TreeController
 
-tree = BinaryTree()
-
-tree.insert("Documents", True)
-tree.insert("Backups", True)
-tree.insert("Pictures", True)
-tree.insert("Archive", True)
-tree.insert("Photos", True)
-
-print("Before:", tree.in_order())
-
-result = tree.delete("Documents")
-
-print("Deleted:", result)
-print("After:", tree.in_order())
+if __name__ == "__main__":
+    controller = TreeController()
+    controller.run()

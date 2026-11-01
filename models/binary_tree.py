@@ -1,3 +1,5 @@
+from unicodedata import name
+
 from models.node import Node
 from collections import deque
 
@@ -7,31 +9,48 @@ class BinaryTree:
 
     def insert(self, name, is_folder):
 
+        if not isinstance(name, str) or not name.strip():
+            return False, 0
+
         new_node = Node(name, is_folder)
 
         if self.root is None:
             self.root = new_node
-            return True
+            return True, 0
 
         current = self.root
+        comparisons = 0
 
         while True:
+
             if not current.is_folder:
-                return False
+                return False, comparisons
+
+            comparisons += 1
+
             if name.casefold() < current.name.casefold():
+
                 if current.left is None:
                     current.left = new_node
-                    return True
+                    return True, comparisons
+
                 current = current.left
+
             elif name.casefold() > current.name.casefold():
+
                 if current.right is None:
                     current.right = new_node
-                    return True
+                    return True, comparisons
+
                 current = current.right
+
             else:
-                return False
+                return False, comparisons
 
     def search(self, name):
+
+        if not isinstance(name, str) or not name.strip():
+            return None, 0
 
         current = self.root
         comparisons = 0
@@ -205,3 +224,51 @@ class BinaryTree:
             return 1 + max(left_height, right_height)
 
         return calculate_height(self.root)
+
+    def update(self, old_name, new_name):
+
+        if (not isinstance(old_name, str) or not old_name.strip()
+                or not isinstance(new_name, str) or not new_name.strip()):
+            return False
+
+        node, parent = self._find_node(old_name)
+
+        if node is None:
+            return False
+
+        if old_name.casefold() == new_name.casefold():
+            return True
+
+        existing_node, comparisons = self.search(new_name)
+
+        if existing_node is not None:
+            return False
+
+        temporary_tree = BinaryTree()
+        temporary_tree.root = self._clone_subtree(self.root)
+
+        original_node, parent = temporary_tree._find_node(old_name)
+
+        is_folder = original_node.is_folder
+
+        if not temporary_tree.delete(old_name):
+            return False
+
+        if not temporary_tree.insert(new_name, is_folder):
+            return False
+
+        self.root = temporary_tree.root
+
+        return True
+
+    def _clone_subtree(self, current):
+
+        if current is None:
+            return None
+
+        new_node = Node(current.name, current.is_folder)
+
+        new_node.left = self._clone_subtree(current.left)
+        new_node.right = self._clone_subtree(current.right)
+
+        return new_node
